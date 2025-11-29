@@ -57,6 +57,8 @@ ANTHROPIC_API_KEY=your-api-key-here
 
 **IMPORTANT: Never commit directly to main.**
 
+**IMPORTANT: Never commit and push until the user explicitly tells you to.** Always wait for user approval before running git commands that modify the repository.
+
 A pre-push hook is installed to prevent direct pushes to main. If you need to set it up:
 
 ```bash
