@@ -13,6 +13,19 @@ interface FileExplorerProps {
 
 export default function FileExplorer({ tree, basePath = "/file" }: FileExplorerProps) {
   const pathname = usePathname();
+  const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set());
+  
+  const toggleExpanded = (path: string) => {
+    setExpandedPaths((prev) => {
+      const next = new Set(prev);
+      if (next.has(path)) {
+        next.delete(path);
+      } else {
+        next.add(path);
+      }
+      return next;
+    });
+  };
   
   return (
     <div className="h-full overflow-y-auto">
@@ -24,6 +37,8 @@ export default function FileExplorer({ tree, basePath = "/file" }: FileExplorerP
             basePath={basePath}
             pathname={pathname}
             level={0}
+            expandedPaths={expandedPaths}
+            toggleExpanded={toggleExpanded}
           />
         ))}
       </div>
@@ -36,10 +51,12 @@ interface TreeNodeProps {
   basePath: string;
   pathname: string;
   level: number;
+  expandedPaths: Set<string>;
+  toggleExpanded: (path: string) => void;
 }
 
-function TreeNode({ node, basePath, pathname, level }: TreeNodeProps) {
-  const [isExpanded, setIsExpanded] = useState(level < 2); // Expand first 2 levels by default
+function TreeNode({ node, basePath, pathname, level, expandedPaths, toggleExpanded }: TreeNodeProps) {
+  const isExpanded = expandedPaths.has(node.path);
   const isActive = pathname === `${basePath}/${node.path}`;
 
   if (node.type === "file") {
@@ -62,7 +79,7 @@ function TreeNode({ node, basePath, pathname, level }: TreeNodeProps) {
   return (
     <div>
       <button
-        onClick={() => setIsExpanded(!isExpanded)}
+        onClick={() => toggleExpanded(node.path)}
         className={`flex items-center gap-2 px-2 py-1.5 rounded text-sm w-full text-left transition-colors hover:bg-gray-100 ${
           isActive ? "bg-blue-50" : ""
         }`}
@@ -89,6 +106,8 @@ function TreeNode({ node, basePath, pathname, level }: TreeNodeProps) {
               basePath={basePath}
               pathname={pathname}
               level={level + 1}
+              expandedPaths={expandedPaths}
+              toggleExpanded={toggleExpanded}
             />
           ))}
         </div>
