@@ -126,23 +126,6 @@ Lightweight wrapper around `react-markdown` with a prose theme for cases where y
 <MarkdownRenderer content={markdown} />
 ```
 
-### `<Navigation />`
-Sticky top navigation bar with MemoryBench branding and an "Add File" button that toggles the modal. Include it near the root layout so it persists across routes.
-
-**Usage:**
-```tsx
-export default function RootLayout({ children }) {
-  return (
-    <html lang="en">
-      <body>
-        <Navigation />
-        {children}
-      </body>
-    </html>
-  );
-}
-```
-
 ### `<AddFileModal isOpen={boolean} onClose={() => void}>`
 Modal dialog that captures the metadata and Markdown content for a new file. Includes Markdown tips, mock folder shortcuts, and a simulated submission state.
 
@@ -157,6 +140,6 @@ const [open, setOpen] = useState(false);
 ```
 
 ## Implementation Notes
-- Components that manage user interaction (`ChatInterface`, `FileExplorer`, `AddFileModal`, `Navigation`) are client components (`'use client'`). Import them only from client-aware contexts.
+- Components that manage user interaction (`ChatInterface`, `FileExplorer`, `AddFileModal`, `MobileSidebar`) are client components (`'use client'`). Import them only from client-aware contexts.
 - Utility functions in `lib/markdown.ts` touch the filesystem and therefore must run on the server (Build step, server actions, or API routes).
 - The chat API uses streaming responses; update your UI incrementally for best UX.

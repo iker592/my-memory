@@ -27,7 +27,11 @@ memorybench/
 ├── components/            # React components
 │   ├── ChatInterface.tsx  # Main chat UI
 │   ├── FileExplorer.tsx   # File sidebar
-│   └── Navigation.tsx     # Top navigation
+│   ├── FilePageLayout.tsx # File page wrapper
+│   ├── FileRenderer.tsx   # File content renderer
+│   ├── MobileSidebar.tsx  # Shared sidebar components
+│   ├── SidebarAddFile.tsx # Add file button + modal
+│   └── AddFileModal.tsx   # Add file dialog
 ├── content/               # Markdown content files
 ├── lib/                   # Utility functions
 └── public/                # Static assets

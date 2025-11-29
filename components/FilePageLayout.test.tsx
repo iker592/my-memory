@@ -107,5 +107,41 @@ describe("FilePageLayout", () => {
     expect(backLinks.length).toBeGreaterThan(0);
     expect(backLinks[0]).toHaveAttribute("href", "/");
   });
+
+  it("renders Add File button in sidebar", () => {
+    render(<FilePageLayout {...defaultProps} />);
+
+    const addFileButton = screen.getByRole("button", { name: /add file/i });
+    expect(addFileButton).toBeInTheDocument();
+  });
+
+  it("opens Add File modal when button is clicked", () => {
+    render(<FilePageLayout {...defaultProps} />);
+
+    // Click Add File button
+    const addFileButton = screen.getByRole("button", { name: /add file/i });
+    fireEvent.click(addFileButton);
+
+    // Modal should appear with "Create New File" heading
+    expect(screen.getByRole("heading", { name: /create new file/i })).toBeInTheDocument();
+  });
+
+  it("closes Add File modal when cancel is clicked", () => {
+    render(<FilePageLayout {...defaultProps} />);
+
+    // Open the modal
+    const addFileButton = screen.getByRole("button", { name: /add file/i });
+    fireEvent.click(addFileButton);
+
+    // Modal should be open
+    expect(screen.getByRole("heading", { name: /create new file/i })).toBeInTheDocument();
+
+    // Click cancel
+    const cancelButton = screen.getByRole("button", { name: /cancel/i });
+    fireEvent.click(cancelButton);
+
+    // Modal should be closed
+    expect(screen.queryByRole("heading", { name: /create new file/i })).not.toBeInTheDocument();
+  });
 });
 

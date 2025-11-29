@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, FormEvent } from 'react';
 import { Send, Loader2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import FileExplorer from './FileExplorer';
+import SidebarAddFile from './SidebarAddFile';
 import { FileTreeNode } from '@/lib/markdown';
 import {
   SidebarProvider,
@@ -131,6 +132,7 @@ function ChatInterfaceContent({ fileTree }: ChatInterfaceProps) {
         <div className="hidden md:block p-4 border-b border-gray-200">
           <h2 className="text-sm font-semibold text-gray-900 uppercase tracking-wider">Files</h2>
         </div>
+        <SidebarAddFile />
         <FileExplorer tree={fileTree} onFileClick={closeSidebar} />
       </SidebarContainer>
 
@@ -226,11 +228,11 @@ function ChatInterfaceContent({ fileTree }: ChatInterfaceProps) {
             <div className="flex-1 flex flex-col items-center justify-center px-4">
               <div className="w-full max-w-2xl text-center">
                 <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center mb-6 sm:mb-8 shadow-lg mx-auto">
-                  <span className="text-2xl sm:text-3xl text-white">💭</span>
+                  <span className="text-2xl sm:text-3xl text-white">✨</span>
                 </div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 sm:mb-3">Welcome to MemoryBench</h1>
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 sm:mb-3">What would you like to explore?</h1>
                 <p className="text-gray-500 mb-8 sm:mb-10 text-base sm:text-lg px-4">
-                  Ask me anything about your notes, or let me help you organize your thoughts.
+                  Search your knowledge, ask questions, or discover new connections.
                 </p>
                 
                 <form onSubmit={handleSubmit} className="w-full px-2 sm:px-0">
@@ -256,7 +258,6 @@ function ChatInterfaceContent({ fileTree }: ChatInterfaceProps) {
                       )}
                     </button>
                   </div>
-                  <p className="mt-4 text-xs sm:text-sm text-gray-400">Powered by Claude AI</p>
                 </form>
               </div>
             </div>

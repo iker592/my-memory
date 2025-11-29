@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import FileExplorer from './FileExplorer';
 import FileRenderer from './FileRenderer';
+import SidebarAddFile from './SidebarAddFile';
 import { FileTreeNode } from '@/lib/markdown';
 import {
   SidebarProvider,
@@ -63,6 +64,7 @@ function FilePageLayoutContent({
           </h2>
         </div>
 
+        <SidebarAddFile />
         <FileExplorer tree={fileTree} onFileClick={closeSidebar} />
       </SidebarContainer>
 
