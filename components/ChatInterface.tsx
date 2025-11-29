@@ -28,16 +28,23 @@ export default function ChatInterface({ fileTree }: ChatInterfaceProps) {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!input.trim() || isLoading) return;
+    
+    // Get value from form input directly to handle fast typing
+    const form = e.target as HTMLFormElement;
+    const inputElement = form.querySelector('input[type="text"]') as HTMLInputElement;
+    const inputValue = inputElement?.value || input;
+    
+    if (!inputValue.trim() || isLoading) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
-      content: input.trim(),
+      content: inputValue.trim(),
     };
 
     setMessages(prev => [...prev, userMessage]);
     setInput('');
+    if (inputElement) inputElement.value = '';
     setIsLoading(true);
 
     try {
@@ -181,7 +188,7 @@ export default function ChatInterface({ fileTree }: ChatInterfaceProps) {
                   />
                   <button
                     type="submit"
-                    disabled={isLoading || !input.trim()}
+                    disabled={isLoading}
                     className="flex items-center justify-center w-9 h-9 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     {isLoading ? (
@@ -219,7 +226,7 @@ export default function ChatInterface({ fileTree }: ChatInterfaceProps) {
                   />
                   <button
                     type="submit"
-                    disabled={isLoading || !input.trim()}
+                    disabled={isLoading}
                     className="flex items-center justify-center w-11 h-11 rounded-xl bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     {isLoading ? (

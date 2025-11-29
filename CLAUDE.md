@@ -197,6 +197,76 @@ gh pr status
 4. Verify file explorer works
 5. Check console for errors
 
+## Browser Testing with MCP Tools
+
+When testing in the browser using MCP browser tools:
+
+### Navigation and Screenshots
+```
+- browser_navigate: Navigate to a URL
+- browser_snapshot: Get page accessibility tree (for finding elements)
+- browser_take_screenshot: Capture visual state
+```
+
+### Interacting with Elements
+```
+- browser_click: Click on elements (use ref from snapshot)
+- browser_type: Type text into inputs
+- browser_press_key: Press keyboard keys (Enter, Tab, etc.)
+- browser_wait_for: Wait for time or text to appear
+```
+
+### Testing Flow
+1. Navigate to the page: `browser_navigate` to localhost or production URL
+2. Take a snapshot: `browser_snapshot` to get element references
+3. Interact: Use `browser_click`, `browser_type` with refs from snapshot
+4. Verify: Take screenshots to confirm visual state
+
+### Known Issues
+- **Fast typing**: When using `browser_type`, React state may not update fast enough. The chat form reads input value directly from DOM to handle this.
+- **Element refs**: Always get fresh refs with `browser_snapshot` after page changes.
+
+### Production Testing
+Test production deployment at: https://memorybench.vercel.app
+- Verify chat functionality works with streaming
+- Check file explorer navigation
+- Test JSON/code file rendering
+
+## Vercel Deployment
+
+The project is deployed on Vercel at: https://memorybench.vercel.app
+
+### Checking Deployment Status
+
+Use the Vercel CLI to check deployments:
+
+```bash
+# List recent deployments with status
+vercel ls --yes
+
+# Inspect a specific deployment
+vercel inspect <deployment-url>
+
+# View deployment logs
+vercel logs <deployment-url>
+
+# Open project in Vercel dashboard
+vercel open
+```
+
+### Deployment Status Meanings
+
+- **● Ready** - Deployment successful and live
+- **○ Building** - Deployment in progress
+- **✕ Error** - Deployment failed (check logs)
+
+### Environment Variables
+
+Make sure `ANTHROPIC_API_KEY` is set in Vercel:
+1. Go to Vercel Dashboard → Project → Settings → Environment Variables
+2. Add `ANTHROPIC_API_KEY` with your key
+3. Redeploy if needed
+
 ## License
 
 The plugins in `agents/` are under proprietary commercial license. See individual LICENSE files in each plugin directory.
