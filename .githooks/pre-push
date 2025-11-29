@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# Pre-push hook to prevent direct pushes to main branch
+# Install with: git config core.hooksPath .githooks
+
+protected_branch='main'
+current_branch=$(git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,')
+
+# Check if pushing to main
+while read local_ref local_sha remote_ref remote_sha
+do
+    if [[ "$remote_ref" == *"$protected_branch"* ]]; then
+        # Allow if it's a merge from GitHub (empty local_sha means delete, skip that too)
+        if [ "$local_sha" = "0000000000000000000000000000000000000000" ]; then
+            exit 0
+        fi
+        
+        # Check if this is being run by gh CLI (merge operation)
+        if [ -n "$GH_TOKEN" ] || [ -n "$GITHUB_TOKEN" ]; then
+            exit 0
+        fi
+        
+        echo "🚫 Direct push to '$protected_branch' is not allowed!"
+        echo ""
+        echo "Please create a branch and open a PR instead:"
+        echo "  git checkout -b feature/your-feature"
+        echo "  git push -u origin feature/your-feature"
+        echo "  gh pr create --title \"Your title\" --body \"Description\""
+        echo ""
+        exit 1
+    fi
+done
+
+exit 0
+

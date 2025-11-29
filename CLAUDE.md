@@ -57,6 +57,14 @@ ANTHROPIC_API_KEY=your-api-key-here
 
 **IMPORTANT: Never commit directly to main.**
 
+**IMPORTANT: Never commit and push until the user explicitly tells you to.** Always wait for user approval before running git commands that modify the repository.
+
+A pre-push hook is installed to prevent direct pushes to main. If you need to set it up:
+
+```bash
+git config core.hooksPath .githooks
+```
+
 ### Creating Changes
 
 1. Create a new branch for your changes:
@@ -86,6 +94,19 @@ ANTHROPIC_API_KEY=your-api-key-here
    git checkout main
    git pull
    ```
+
+### Merging PRs
+
+When merging, use this sequence to ensure GitHub has processed the merge:
+
+```bash
+gh pr merge --squash --delete-branch
+sleep 2
+git checkout main
+git pull
+```
+
+The `sleep 2` ensures GitHub has time to process the merge before pulling.
 
 ### Reviewing PRs
 
