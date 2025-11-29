@@ -4,6 +4,11 @@ import path from "path";
 const contentDirectory = path.join(process.cwd(), "content");
 const agentsDirectory = path.join(process.cwd(), "agents");
 
+export interface DirectoryOverrides {
+  contentDir?: string;
+  agentsDir?: string;
+}
+
 export interface MarkdownFile {
   slug: string;
   path: string; // Full path relative to content directory
@@ -88,9 +93,12 @@ export function buildFileTree(dirPath: string = contentDirectory, relativePath: 
 }
 
 // Build combined file tree from multiple directories
-export function buildCombinedFileTree(): FileTreeNode[] {
-  const contentTree = buildFileTree(contentDirectory, "", "content", "content");
-  const agentsTree = buildFileTree(agentsDirectory, "", "agents", "agents");
+export function buildCombinedFileTree(overrides?: DirectoryOverrides): FileTreeNode[] {
+  const contentRoot = overrides?.contentDir ?? contentDirectory;
+  const agentsRoot = overrides?.agentsDir ?? agentsDirectory;
+
+  const contentTree = buildFileTree(contentRoot, "", "content", "content");
+  const agentsTree = buildFileTree(agentsRoot, "", "agents", "agents");
   
   const combined: FileTreeNode[] = [];
   
@@ -119,8 +127,10 @@ export function buildCombinedFileTree(): FileTreeNode[] {
   return combined;
 }
 
-export function getAllFiles(): MarkdownFile[] {
+export function getAllFiles(overrides?: DirectoryOverrides): MarkdownFile[] {
   const files: MarkdownFile[] = [];
+  const contentRoot = overrides?.contentDir ?? contentDirectory;
+  const agentsRoot = overrides?.agentsDir ?? agentsDirectory;
 
   function traverseDirectory(dirPath: string, relativePath: string = "", source: string = "content") {
     if (!fs.existsSync(dirPath)) {
@@ -153,24 +163,26 @@ export function getAllFiles(): MarkdownFile[] {
     }
   }
 
-  traverseDirectory(contentDirectory, "", "content");
-  traverseDirectory(agentsDirectory, "", "agents");
+  traverseDirectory(contentRoot, "", "content");
+  traverseDirectory(agentsRoot, "", "agents");
   return files.sort((a, b) => b.lastModified.getTime() - a.lastModified.getTime());
 }
 
-export function getFileByPath(filePath: string): MarkdownFile | null {
+export function getFileByPath(filePath: string, overrides?: DirectoryOverrides): MarkdownFile | null {
+  const contentRoot = overrides?.contentDir ?? contentDirectory;
+  const agentsRoot = overrides?.agentsDir ?? agentsDirectory;
   // Check if path starts with a source prefix
-  let baseDir = contentDirectory;
+  let baseDir = contentRoot;
   let normalizedPath = filePath;
   let source = "content";
   
   if (filePath.startsWith("content/")) {
     normalizedPath = filePath.replace("content/", "");
-    baseDir = contentDirectory;
+    baseDir = contentRoot;
     source = "content";
   } else if (filePath.startsWith("agents/")) {
     normalizedPath = filePath.replace("agents/", "");
-    baseDir = agentsDirectory;
+    baseDir = agentsRoot;
     source = "agents";
   }
   
@@ -195,7 +207,7 @@ export function getFileByPath(filePath: string): MarkdownFile | null {
   
   // Try content directory as fallback
   for (const ext of SUPPORTED_EXTENSIONS) {
-    const fallbackPath = path.join(contentDirectory, `${filePath}${ext}`);
+    const fallbackPath = path.join(contentRoot, `${filePath}${ext}`);
     if (fs.existsSync(fallbackPath)) {
       const fileContents = fs.readFileSync(fallbackPath, "utf8");
       const stats = fs.statSync(fallbackPath);
