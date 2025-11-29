@@ -1,4 +1,4 @@
-# My Memory
+# MemoryBench
 
 A personal knowledge base and memory repository built with Next.js, TypeScript, and Tailwind CSS.
 
@@ -32,7 +32,7 @@ Simply add markdown files (`.md`) to the `content/` directory. They will automat
 ## Project Structure
 
 ```
-my-memory/
+memorybench/
 ├── app/
 │   ├── page.tsx          # Homepage with file browser
 │   ├── file/[slug]/      # Dynamic route for markdown files

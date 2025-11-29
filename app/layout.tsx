@@ -9,7 +9,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "My Memory - Personal Knowledge Base",
+  title: "MemoryBench - Personal Knowledge Base",
   description: "A personal markdown-based knowledge base and memory repository",
 };
 

@@ -201,7 +201,7 @@ export default function ChatInterface({ fileTree }: ChatInterfaceProps) {
               <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center mb-8 shadow-lg mx-auto">
                 <span className="text-3xl text-white">💭</span>
               </div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-3">Welcome to My Memory</h1>
+              <h1 className="text-3xl font-bold text-gray-900 mb-3">Welcome to MemoryBench</h1>
               <p className="text-gray-500 mb-10 text-lg">
                 Ask me anything about your notes, or let me help you organize your thoughts.
               </p>

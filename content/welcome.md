@@ -1,4 +1,4 @@
-# Welcome to My Memory
+# Welcome to MemoryBench
 
 This is your personal knowledge base and memory repository.
 
