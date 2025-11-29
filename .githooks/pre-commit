@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# Pre-commit hook to prevent commits directly on main branch
+# Install with: git config core.hooksPath .githooks
+
+protected_branch='main'
+current_branch=$(git symbolic-ref --short HEAD 2>/dev/null)
+
+if [ "$current_branch" = "$protected_branch" ]; then
+    echo "🚫 Commits directly on '$protected_branch' are not allowed!"
+    echo ""
+    echo "Please create a branch first:"
+    echo "  git checkout -b feature/your-feature"
+    echo ""
+    exit 1
+fi
+
+exit 0
+
