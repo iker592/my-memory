@@ -15,7 +15,7 @@ export default function FileRenderer({ content, fileName }: FileRendererProps) {
   
   if (isMarkdown) {
     return (
-      <div className="prose prose-lg max-w-none prose-headings:font-bold prose-headings:text-gray-900 prose-p:text-gray-700 prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline prose-code:bg-gray-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-pre:rounded-lg prose-blockquote:border-l-4 prose-blockquote:border-gray-300 prose-blockquote:pl-4 prose-blockquote:italic prose-ul:list-disc prose-ol:list-decimal">
+      <div className="prose prose-sm sm:prose-base lg:prose-lg max-w-none prose-headings:font-bold prose-headings:text-gray-900 prose-p:text-gray-700 prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline prose-blockquote:border-l-4 prose-blockquote:border-gray-300 prose-blockquote:pl-4 prose-blockquote:italic prose-ul:list-disc prose-ol:list-decimal [&>*:not(pre)>code]:bg-gray-100 [&>*:not(pre)>code]:px-1 [&>*:not(pre)>code]:py-0.5 [&>*:not(pre)>code]:rounded [&>*:not(pre)>code]:text-xs sm:[&>*:not(pre)>code]:text-sm [&>pre]:bg-gray-900 [&>pre]:text-gray-100 [&>pre]:rounded-lg [&>pre]:p-4 [&>pre]:overflow-x-auto [&>pre]:text-xs sm:[&>pre]:text-sm [&>pre>code]:bg-transparent [&>pre>code]:p-0">
         <ReactMarkdown remarkPlugins={[remarkGfm]}>
           {content}
         </ReactMarkdown>
@@ -33,7 +33,7 @@ export default function FileRenderer({ content, fileName }: FileRendererProps) {
     }
     
     return (
-      <pre className="bg-gray-900 text-gray-100 rounded-lg p-4 overflow-x-auto text-sm">
+      <pre className="bg-gray-900 text-gray-100 rounded-lg p-3 sm:p-4 overflow-x-auto text-xs sm:text-sm">
         <code>{formattedContent}</code>
       </pre>
     );
@@ -42,7 +42,7 @@ export default function FileRenderer({ content, fileName }: FileRendererProps) {
   // Code files
   if (isCode) {
     return (
-      <pre className="bg-gray-900 text-gray-100 rounded-lg p-4 overflow-x-auto text-sm">
+      <pre className="bg-gray-900 text-gray-100 rounded-lg p-3 sm:p-4 overflow-x-auto text-xs sm:text-sm">
         <code>{content}</code>
       </pre>
     );
@@ -50,7 +50,7 @@ export default function FileRenderer({ content, fileName }: FileRendererProps) {
   
   // Fallback - plain text
   return (
-    <pre className="bg-gray-100 rounded-lg p-4 overflow-x-auto text-sm text-gray-800 whitespace-pre-wrap">
+    <pre className="bg-gray-100 rounded-lg p-3 sm:p-4 overflow-x-auto text-xs sm:text-sm text-gray-800 whitespace-pre-wrap">
       {content}
     </pre>
   );

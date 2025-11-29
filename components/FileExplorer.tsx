@@ -9,6 +9,7 @@ import { FileTreeNode } from "@/lib/markdown";
 interface FileExplorerProps {
   tree: FileTreeNode[];
   basePath?: string;
+  onFileClick?: () => void;
 }
 
 // Get parent paths from a file path
@@ -21,7 +22,7 @@ function getParentPaths(filePath: string): string[] {
   return paths;
 }
 
-export default function FileExplorer({ tree, basePath = "/file" }: FileExplorerProps) {
+export default function FileExplorer({ tree, basePath = "/file", onFileClick }: FileExplorerProps) {
   const pathname = usePathname();
   
   // Initialize expanded paths based on current pathname
@@ -57,6 +58,7 @@ export default function FileExplorer({ tree, basePath = "/file" }: FileExplorerP
             level={0}
             expandedPaths={expandedPaths}
             toggleExpanded={toggleExpanded}
+            onFileClick={onFileClick}
           />
         ))}
       </div>
@@ -71,9 +73,10 @@ interface TreeNodeProps {
   level: number;
   expandedPaths: Set<string>;
   toggleExpanded: (path: string) => void;
+  onFileClick?: () => void;
 }
 
-function TreeNode({ node, basePath, pathname, level, expandedPaths, toggleExpanded }: TreeNodeProps) {
+function TreeNode({ node, basePath, pathname, level, expandedPaths, toggleExpanded, onFileClick }: TreeNodeProps) {
   const isExpanded = expandedPaths.has(node.path);
   const isActive = pathname === `${basePath}/${node.path}`;
 
@@ -85,7 +88,8 @@ function TreeNode({ node, basePath, pathname, level, expandedPaths, toggleExpand
     return (
       <Link
         href={`${basePath}/${node.path}`}
-        className={`flex items-center gap-2 px-2 py-1.5 rounded text-sm transition-colors ${
+        onClick={onFileClick}
+        className={`flex items-center gap-2 px-2 py-2 sm:py-1.5 rounded text-sm transition-colors ${
           isActive
             ? "bg-blue-100 text-blue-700 font-medium"
             : "text-gray-700 hover:bg-gray-100"
@@ -102,7 +106,7 @@ function TreeNode({ node, basePath, pathname, level, expandedPaths, toggleExpand
     <div>
       <button
         onClick={() => toggleExpanded(node.path)}
-        className={`flex items-center gap-2 px-2 py-1.5 rounded text-sm w-full text-left transition-colors hover:bg-gray-100 ${
+        className={`flex items-center gap-2 px-2 py-2 sm:py-1.5 rounded text-sm w-full text-left transition-colors hover:bg-gray-100 ${
           isActive ? "bg-blue-50" : ""
         }`}
         style={{ paddingLeft: `${level * 16 + 8}px` }}
@@ -130,6 +134,7 @@ function TreeNode({ node, basePath, pathname, level, expandedPaths, toggleExpand
               level={level + 1}
               expandedPaths={expandedPaths}
               toggleExpanded={toggleExpanded}
+              onFileClick={onFileClick}
             />
           ))}
         </div>
