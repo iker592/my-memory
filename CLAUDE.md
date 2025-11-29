@@ -57,6 +57,12 @@ ANTHROPIC_API_KEY=your-api-key-here
 
 **IMPORTANT: Never commit directly to main.**
 
+A pre-push hook is installed to prevent direct pushes to main. If you need to set it up:
+
+```bash
+git config core.hooksPath .githooks
+```
+
 ### Creating Changes
 
 1. Create a new branch for your changes:
