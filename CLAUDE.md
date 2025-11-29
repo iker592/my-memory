@@ -87,6 +87,19 @@ ANTHROPIC_API_KEY=your-api-key-here
    git pull
    ```
 
+### Merging PRs
+
+When merging, use this sequence to ensure GitHub has processed the merge:
+
+```bash
+gh pr merge --squash --delete-branch
+sleep 2
+git checkout main
+git pull
+```
+
+The `sleep 2` ensures GitHub has time to process the merge before pulling.
+
 ### Reviewing PRs
 
 When the user asks to "review the PR", check the PR diff and provide feedback:
