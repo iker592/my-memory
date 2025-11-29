@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 
 const contentDirectory = path.join(process.cwd(), "content");
+const agentsDirectory = path.join(process.cwd(), "agents");
 
 export interface MarkdownFile {
   slug: string;
@@ -9,6 +10,8 @@ export interface MarkdownFile {
   title: string;
   content: string;
   lastModified: Date;
+  source?: string; // Which directory it came from
+  fileName?: string; // Original filename with extension
 }
 
 export interface FileTreeNode {
@@ -17,10 +20,14 @@ export interface FileTreeNode {
   type: "file" | "directory";
   children?: FileTreeNode[];
   lastModified?: Date;
+  source?: string; // Which directory it came from
 }
 
-function isMarkdownFile(fileName: string): boolean {
-  return fileName.endsWith(".md");
+// Supported file types for display
+const SUPPORTED_EXTENSIONS = ['.md', '.json', '.txt', '.sh', '.py', '.js', '.ts'];
+
+function isSupportedFile(fileName: string): boolean {
+  return SUPPORTED_EXTENSIONS.some(ext => fileName.endsWith(ext));
 }
 
 function getFileTitle(filePath: string): string {
@@ -33,7 +40,7 @@ function getFileTitle(filePath: string): string {
   return fileName;
 }
 
-export function buildFileTree(dirPath: string = contentDirectory, relativePath: string = ""): FileTreeNode[] {
+export function buildFileTree(dirPath: string = contentDirectory, relativePath: string = "", source?: string, pathPrefix?: string): FileTreeNode[] {
   if (!fs.existsSync(dirPath)) {
     return [];
   }
@@ -51,24 +58,28 @@ export function buildFileTree(dirPath: string = contentDirectory, relativePath: 
   for (const entry of entries) {
     const fullPath = path.join(dirPath, entry.name);
     const itemRelativePath = relativePath ? `${relativePath}/${entry.name}` : entry.name;
+    // Full path includes the prefix (e.g., "content/" or "agents/")
+    const fullItemPath = pathPrefix ? `${pathPrefix}/${itemRelativePath}` : itemRelativePath;
 
     if (entry.isDirectory()) {
-      const children = buildFileTree(fullPath, itemRelativePath);
+      const children = buildFileTree(fullPath, itemRelativePath, source, pathPrefix);
       if (children.length > 0) {
         items.push({
           name: entry.name,
-          path: itemRelativePath,
+          path: fullItemPath,
           type: "directory",
           children,
+          source,
         });
       }
-    } else if (isMarkdownFile(entry.name)) {
+    } else if (isSupportedFile(entry.name)) {
       const stats = fs.statSync(fullPath);
       items.push({
         name: entry.name,
-        path: itemRelativePath.replace(/\.md$/, ""), // Remove .md extension
+        path: fullItemPath.replace(/\.(md|json|txt|sh|py|js|ts)$/, ""), // Remove extension
         type: "file",
         lastModified: stats.mtime,
+        source,
       });
     }
   }
@@ -76,10 +87,42 @@ export function buildFileTree(dirPath: string = contentDirectory, relativePath: 
   return items;
 }
 
-export function getAllMarkdownFiles(): MarkdownFile[] {
+// Build combined file tree from multiple directories
+export function buildCombinedFileTree(): FileTreeNode[] {
+  const contentTree = buildFileTree(contentDirectory, "", "content", "content");
+  const agentsTree = buildFileTree(agentsDirectory, "", "agents", "agents");
+  
+  const combined: FileTreeNode[] = [];
+  
+  // Add content section
+  if (contentTree.length > 0) {
+    combined.push({
+      name: "Content",
+      path: "content",
+      type: "directory",
+      children: contentTree,
+      source: "content",
+    });
+  }
+  
+  // Add agents section
+  if (agentsTree.length > 0) {
+    combined.push({
+      name: "Agents",
+      path: "agents",
+      type: "directory",
+      children: agentsTree,
+      source: "agents",
+    });
+  }
+  
+  return combined;
+}
+
+export function getAllFiles(): MarkdownFile[] {
   const files: MarkdownFile[] = [];
 
-  function traverseDirectory(dirPath: string, relativePath: string = "") {
+  function traverseDirectory(dirPath: string, relativePath: string = "", source: string = "content") {
     if (!fs.existsSync(dirPath)) {
       return;
     }
@@ -91,49 +134,84 @@ export function getAllMarkdownFiles(): MarkdownFile[] {
       const itemRelativePath = relativePath ? `${relativePath}/${entry.name}` : entry.name;
 
       if (entry.isDirectory()) {
-        traverseDirectory(fullPath, itemRelativePath);
-      } else if (isMarkdownFile(entry.name)) {
+        traverseDirectory(fullPath, itemRelativePath, source);
+      } else if (isSupportedFile(entry.name)) {
         const fileContents = fs.readFileSync(fullPath, "utf8");
         const stats = fs.statSync(fullPath);
         const title = getFileTitle(fullPath);
-        const slug = itemRelativePath.replace(/\.md$/, "");
+        const slug = itemRelativePath.replace(/\.(md|json|txt|sh|py|js|ts)$/, "");
 
         files.push({
           slug,
-          path: itemRelativePath,
+          path: `${source}/${slug}`,
           title,
           content: fileContents,
           lastModified: stats.mtime,
+          source,
         });
       }
     }
   }
 
-  traverseDirectory(contentDirectory);
+  traverseDirectory(contentDirectory, "", "content");
+  traverseDirectory(agentsDirectory, "", "agents");
   return files.sort((a, b) => b.lastModified.getTime() - a.lastModified.getTime());
 }
 
-export function getMarkdownFileByPath(filePath: string): MarkdownFile | null {
-  // Handle both slug format (projects/web/react-project) and full path
-  const normalizedPath = filePath.startsWith("content/") 
-    ? filePath.replace("content/", "") 
-    : filePath;
+export function getFileByPath(filePath: string): MarkdownFile | null {
+  // Check if path starts with a source prefix
+  let baseDir = contentDirectory;
+  let normalizedPath = filePath;
+  let source = "content";
   
-  const fullPath = path.join(contentDirectory, `${normalizedPath}.md`);
-  
-  if (!fs.existsSync(fullPath)) {
-    return null;
+  if (filePath.startsWith("content/")) {
+    normalizedPath = filePath.replace("content/", "");
+    baseDir = contentDirectory;
+    source = "content";
+  } else if (filePath.startsWith("agents/")) {
+    normalizedPath = filePath.replace("agents/", "");
+    baseDir = agentsDirectory;
+    source = "agents";
   }
-
-  const fileContents = fs.readFileSync(fullPath, "utf8");
-  const stats = fs.statSync(fullPath);
-  const title = getFileTitle(fullPath);
-
-  return {
-    slug: normalizedPath,
-    path: normalizedPath,
-    title,
-    content: fileContents,
-    lastModified: stats.mtime,
-  };
+  
+  // Try each supported extension
+  for (const ext of SUPPORTED_EXTENSIONS) {
+    const fullPath = path.join(baseDir, `${normalizedPath}${ext}`);
+    if (fs.existsSync(fullPath)) {
+      const fileContents = fs.readFileSync(fullPath, "utf8");
+      const stats = fs.statSync(fullPath);
+      const title = getFileTitle(fullPath);
+      return {
+        slug: normalizedPath,
+        path: filePath,
+        title,
+        content: fileContents,
+        lastModified: stats.mtime,
+        source,
+        fileName: path.basename(fullPath),
+      };
+    }
+  }
+  
+  // Try content directory as fallback
+  for (const ext of SUPPORTED_EXTENSIONS) {
+    const fallbackPath = path.join(contentDirectory, `${filePath}${ext}`);
+    if (fs.existsSync(fallbackPath)) {
+      const fileContents = fs.readFileSync(fallbackPath, "utf8");
+      const stats = fs.statSync(fallbackPath);
+      const title = getFileTitle(fallbackPath);
+      return {
+        slug: filePath,
+        path: filePath,
+        title,
+        content: fileContents,
+        lastModified: stats.mtime,
+        source: "content",
+        fileName: path.basename(fallbackPath),
+      };
+    }
+  }
+  
+  return null;
 }
+

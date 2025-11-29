@@ -1,8 +1,8 @@
-import { buildFileTree } from '@/lib/markdown';
+import { buildCombinedFileTree } from '@/lib/markdown';
 import ChatInterface from '@/components/ChatInterface';
 
 export default function Home() {
-  const fileTree = buildFileTree();
+  const fileTree = buildCombinedFileTree();
 
   return <ChatInterface fileTree={fileTree} />;
 }

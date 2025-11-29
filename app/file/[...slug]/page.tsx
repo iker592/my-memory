@@ -2,14 +2,14 @@ import { notFound } from "next/navigation";
 import { use } from "react";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { getMarkdownFileByPath, getAllMarkdownFiles, buildFileTree } from "@/lib/markdown";
-import MarkdownRenderer from "@/components/MarkdownRenderer";
+import { getFileByPath, getAllFiles, buildCombinedFileTree } from "@/lib/markdown";
+import FileRenderer from "@/components/FileRenderer";
 import FileExplorer from "@/components/FileExplorer";
 
 export async function generateStaticParams() {
-  const files = getAllMarkdownFiles();
+  const files = getAllFiles();
   return files.map((file) => ({
-    slug: file.slug.split("/"), // Split path into array for catch-all route
+    slug: file.path.split("/"), // Split path into array for catch-all route
   }));
 }
 
@@ -20,8 +20,8 @@ export default function MarkdownPage({
 }) {
   const { slug } = use(params);
   const filePath = Array.isArray(slug) ? slug.join("/") : slug;
-  const file = getMarkdownFileByPath(filePath);
-  const fileTree = buildFileTree();
+  const file = getFileByPath(filePath);
+  const fileTree = buildCombinedFileTree();
 
   if (!file) {
     notFound();
@@ -56,7 +56,7 @@ export default function MarkdownPage({
               </p>
             </header>
 
-            <MarkdownRenderer content={file.content} />
+            <FileRenderer content={file.content} fileName={file.fileName || 'file.md'} />
           </article>
         </div>
       </main>

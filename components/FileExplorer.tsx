@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronRight, ChevronDown, FileText, Folder, FolderOpen } from "lucide-react";
+import { ChevronRight, ChevronDown, FileText, FileCode, Folder, FolderOpen } from "lucide-react";
 import { FileTreeNode } from "@/lib/markdown";
 
 interface FileExplorerProps {
@@ -11,9 +11,27 @@ interface FileExplorerProps {
   basePath?: string;
 }
 
+// Get parent paths from a file path
+function getParentPaths(filePath: string): string[] {
+  const parts = filePath.split("/");
+  const paths: string[] = [];
+  for (let i = 1; i <= parts.length; i++) {
+    paths.push(parts.slice(0, i).join("/"));
+  }
+  return paths;
+}
+
 export default function FileExplorer({ tree, basePath = "/file" }: FileExplorerProps) {
   const pathname = usePathname();
-  const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set());
+  
+  // Initialize expanded paths based on current pathname
+  const initialExpanded = useMemo(() => {
+    const currentPath = pathname.replace(`${basePath}/`, "");
+    const paths = getParentPaths(currentPath);
+    return new Set(paths);
+  }, [pathname, basePath]);
+  
+  const [expandedPaths, setExpandedPaths] = useState<Set<string>>(initialExpanded);
   
   const toggleExpanded = (path: string) => {
     setExpandedPaths((prev) => {
@@ -60,6 +78,10 @@ function TreeNode({ node, basePath, pathname, level, expandedPaths, toggleExpand
   const isActive = pathname === `${basePath}/${node.path}`;
 
   if (node.type === "file") {
+    const isCode = /\.(json|js|ts|py|sh)$/.test(node.name);
+    const displayName = node.name.replace(/\.(md|json|txt|sh|py|js|ts)$/, "");
+    const Icon = isCode ? FileCode : FileText;
+    
     return (
       <Link
         href={`${basePath}/${node.path}`}
@@ -70,8 +92,8 @@ function TreeNode({ node, basePath, pathname, level, expandedPaths, toggleExpand
         }`}
         style={{ paddingLeft: `${level * 16 + 8}px` }}
       >
-        <FileText className="h-4 w-4 flex-shrink-0" />
-        <span className="truncate">{node.name.replace(".md", "")}</span>
+        <Icon className="h-4 w-4 flex-shrink-0" />
+        <span className="truncate">{displayName}</span>
       </Link>
     );
   }
