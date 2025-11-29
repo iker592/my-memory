@@ -87,6 +87,25 @@ ANTHROPIC_API_KEY=your-api-key-here
    git pull
    ```
 
+### Reviewing PRs
+
+When the user asks to "review the PR", check the PR diff and provide feedback:
+
+```bash
+# View PR diff
+gh pr diff
+
+# View PR details
+gh pr view
+```
+
+Review checklist:
+- Code follows project conventions
+- No unnecessary changes
+- Commit message is clear
+- No sensitive data exposed
+- Tests pass (if applicable)
+
 ### PR Naming Conventions
 
 - `feature/` - New features
