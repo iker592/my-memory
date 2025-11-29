@@ -11,8 +11,8 @@ vi.mock("next/navigation", () => ({
 
 vi.mock("next/link", () => ({
   __esModule: true,
-  default: ({ children, href, className, style }: any) => (
-    <a href={href} className={className} style={style}>
+  default: ({ children, href, className, style, onClick }: any) => (
+    <a href={href} className={className} style={style} onClick={onClick}>
       {children}
     </a>
   ),
@@ -81,5 +81,28 @@ describe("FileExplorer", () => {
     fireEvent.click(toggleButton);
 
     expect(screen.queryByText("script")).toBeNull();
+  });
+
+  it("calls onFileClick callback when a file link is clicked", () => {
+    mockUsePathname.mockReturnValue("/file/content/notes/welcome");
+    const onFileClick = vi.fn();
+
+    render(<FileExplorer tree={sampleTree} basePath="/file" onFileClick={onFileClick} />);
+
+    const fileLink = screen.getByRole("link", { name: /welcome/i });
+    fireEvent.click(fileLink);
+
+    expect(onFileClick).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not crash when onFileClick is not provided", () => {
+    mockUsePathname.mockReturnValue("/file/content/notes/welcome");
+
+    render(<FileExplorer tree={sampleTree} basePath="/file" />);
+
+    const fileLink = screen.getByRole("link", { name: /welcome/i });
+    
+    // Should not throw
+    expect(() => fireEvent.click(fileLink)).not.toThrow();
   });
 });
